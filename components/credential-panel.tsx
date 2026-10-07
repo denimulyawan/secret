@@ -84,6 +84,9 @@ export default function CredentialPanel({
   const [revealState, revealAction, revealing] = useActionState(revealCredential, EMPTY_REVEAL)
   const [openForm, setOpenForm] = useState(credentials.length === 0)
   const [generated, setGenerated] = useState('')
+  // Kredensial mana yang sedang diminta kodenya. Tanpa ini, formulir kode akan
+  // selalu mengirim kredensial pertama — dan membuka password yang salah.
+  const [pendingId, setPendingId] = useState('')
 
   async function fillGenerated() {
     const value = await generatePassword()
@@ -144,7 +147,10 @@ export default function CredentialPanel({
                     </td>
                     <td className="right">
                       <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                        <form action={revealAction}>
+                        <form
+                          action={revealAction}
+                          onSubmit={() => setPendingId(cred.credential_id)}
+                        >
                           <input type="hidden" name="credential_id" value={cred.credential_id} />
                           <button className="btn" type="submit" disabled={revealing || !canReveal || !stepUpReady}>
                             {revealing ? 'Membuka…' : 'Buka password'}
@@ -169,7 +175,7 @@ export default function CredentialPanel({
         {/* Permintaan kode 6 digit */}
         {revealState.needCode ? (
           <form action={revealAction} style={{ marginTop: 16 }}>
-            <input type="hidden" name="credential_id" value={revealStateCredentialId(credentials)} />
+            <input type="hidden" name="credential_id" value={pendingId} />
             <FormField
               label="Kode 6 digit"
               name="code"
@@ -270,13 +276,4 @@ export default function CredentialPanel({
       ) : null}
     </>
   )
-}
-
-/**
- * Mengambil id kredensial terakhir yang dibuka.
- * Formulir kode tidak tahu kredensial mana yang dimaksud, jadi id-nya diambil
- * dari daftar — hanya ada satu permintaan kode yang berjalan pada satu waktu.
- */
-function revealStateCredentialId(credentials: CredentialMeta[]): string {
-  return credentials[0]?.credential_id ?? ''
 }
