@@ -1,3 +1,5 @@
+import { toggleBrand, toggleDeviceType } from '@/lib/actions/catalog'
+import { BrandForm, DeviceTypeForm } from '@/components/catalog-forms'
 import { getRepo } from '@/lib/repo'
 import { requireUser } from '@/lib/session'
 
@@ -24,16 +26,21 @@ export default async function CatalogPage() {
         <div>
           <strong>Nonaktifkan, bukan hapus.</strong> Menghapus brand yang sudah dipakai membuat
           data perangkat lama kehilangan brandnya. Menonaktifkan hanya menyembunyikannya dari
-          pilihan baru. Menghapus baru diizinkan kalau brand itu belum dipakai perangkat mana pun.
+          pilihan baru — data lama tetap utuh.
         </div>
       </div>
 
       <div className="card">
-        <h2 className="section-title">Brand</h2>
+        <h2 className="section-title">Tambah brand</h2>
+        <BrandForm />
+      </div>
+
+      <div className="card">
+        <h2 className="section-title">Brand terdaftar ({brands.length})</h2>
         {brands.length === 0 ? (
           <p className="dim" style={{ margin: 0, fontSize: 14 }}>
-            Belum ada brand di katalog. Tambahkan brand pertama — misalnya FortiGate, Palo Alto,
-            atau Cisco. Isi katalog ini lebih dulu supaya pengisian perangkat jadi lebih cepat.
+            Belum ada brand. Tambahkan brand pertama di atas — misalnya FortiGate, Palo Alto, atau
+            Cisco. Isi katalog ini lebih dulu supaya pengisian perangkat jadi lebih cepat.
           </p>
         ) : (
           <div className="table-wrap">
@@ -44,6 +51,7 @@ export default async function CatalogPage() {
                   <th>Nama</th>
                   <th>Urutan</th>
                   <th>Keadaan</th>
+                  <th className="right">Tindakan</th>
                 </tr>
               </thead>
               <tbody>
@@ -59,6 +67,15 @@ export default async function CatalogPage() {
                         <span className="badge badge-plain">nonaktif</span>
                       )}
                     </td>
+                    <td className="right">
+                      <form action={toggleBrand}>
+                        <input type="hidden" name="brand_code" value={b.brand_code} />
+                        <input type="hidden" name="activate" value={b.is_active ? '0' : '1'} />
+                        <button className="btn" type="submit">
+                          {b.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+                      </form>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -68,7 +85,12 @@ export default async function CatalogPage() {
       </div>
 
       <div className="card">
-        <h2 className="section-title">Jenis perangkat</h2>
+        <h2 className="section-title">Tambah jenis perangkat</h2>
+        <DeviceTypeForm />
+      </div>
+
+      <div className="card">
+        <h2 className="section-title">Jenis perangkat terdaftar ({types.length})</h2>
         {types.length === 0 ? (
           <p className="dim" style={{ margin: 0, fontSize: 14 }}>
             Belum ada jenis perangkat. Contoh yang biasanya dipakai: firewall, router, switch,
@@ -83,6 +105,7 @@ export default async function CatalogPage() {
                   <th>Nama</th>
                   <th>Urutan</th>
                   <th>Keadaan</th>
+                  <th className="right">Tindakan</th>
                 </tr>
               </thead>
               <tbody>
@@ -97,6 +120,15 @@ export default async function CatalogPage() {
                       ) : (
                         <span className="badge badge-plain">nonaktif</span>
                       )}
+                    </td>
+                    <td className="right">
+                      <form action={toggleDeviceType}>
+                        <input type="hidden" name="type_code" value={t.type_code} />
+                        <input type="hidden" name="activate" value={t.is_active ? '0' : '1'} />
+                        <button className="btn" type="submit">
+                          {t.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+                        </button>
+                      </form>
                     </td>
                   </tr>
                 ))}

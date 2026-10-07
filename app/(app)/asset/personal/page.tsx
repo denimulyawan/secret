@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import AccessDenied from '@/components/access-denied'
 import AssetTable from '@/components/asset-table'
 import { getRepo } from '@/lib/repo'
@@ -50,6 +51,9 @@ export default async function PersonalAssetPage() {
             {devices.length} perangkat milik sendiri · hanya terlihat oleh Administrator
           </p>
         </div>
+        <Link className="btn btn-primary" href="/asset/new?category=personal">
+          + Tambah perangkat
+        </Link>
       </div>
 
       <AssetTable

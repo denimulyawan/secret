@@ -36,6 +36,7 @@ const MENU: MenuGroup[] = [
     items: [
       { href: '/setting/users', label: 'Pengguna', icon: '☺', onlyRole: 'administrator' },
       { href: '/setting/alert', label: 'Alert', icon: '◔', onlyRole: 'administrator' },
+      { href: '/setting/security', label: 'Keamanan', icon: '⚿', onlyRole: 'administrator' },
       { href: '/setting/catalog', label: 'Katalog', icon: '☰' },
       { href: '/setting/customers', label: 'Pelanggan & CAR', icon: '☏' },
       { href: '/setting/audit', label: 'Audit Log', icon: '◷' },

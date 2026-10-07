@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import AssetTable from '@/components/asset-table'
 import { getRepo } from '@/lib/repo'
 import { requireUser } from '@/lib/session'
@@ -22,11 +23,11 @@ export default async function CustomerAssetPage() {
       <div className="page-head">
         <div>
           <h1 className="page-title">Asset — Customer</h1>
-          <p className="page-sub">
-            {devices.length} perangkat milik pelanggan
-            {user.role === 'engineer' ? '' : ''}
-          </p>
+          <p className="page-sub">{devices.length} perangkat milik pelanggan</p>
         </div>
+        <Link className="btn btn-primary" href="/asset/new?category=customer">
+          + Tambah perangkat
+        </Link>
       </div>
 
       <AssetTable
