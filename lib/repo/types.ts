@@ -230,6 +230,10 @@ export interface Repo {
   listCustomers(): Promise<Customer[]>
   putCar(data: Partial<Car>): Promise<Car>
   putCustomer(data: Partial<Customer>): Promise<Customer>
+  /** Menghapus CAR. Pemanggil wajib memastikan tidak ada pelanggan yang memakainya. */
+  deleteCar(carId: string, actor: string): Promise<void>
+  /** Menghapus pelanggan. Pemanggil wajib memastikan tidak ada perangkat yang memakainya. */
+  deleteCustomer(customerId: string, actor: string): Promise<void>
 
   // Pengguna
   listUsers(): Promise<User[]>

@@ -1,4 +1,4 @@
-﻿# ============================================================================
+# ============================================================================
 # Repo ini HANYA berisi kode aplikasi. TIDAK ADA DATA di dalamnya.
 # ============================================================================
 # Aturan yang dipegang:
@@ -13,6 +13,7 @@
 # --- Dokumen kerja internal & catatan (bukan bagian aplikasi) ---
 *.md
 !README.md
+!SETUP.md
 docs-internal/
 
 # --- Data aset: apa pun bentuknya ---

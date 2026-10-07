@@ -606,6 +606,30 @@ export class SheetsRepo implements Repo {
     }
   }
 
+  async deleteCar(carId: string, actor: string): Promise<void> {
+    const found = await this.findRow('cars', 'car_id', carId)
+    if (found) await this.blankRow('cars', found.rowNumber)
+    await this.appendAudit({
+      actor_email: actor,
+      action: 'delete',
+      object_type: 'car',
+      object_id: carId,
+      result: 'ok',
+    })
+  }
+
+  async deleteCustomer(customerId: string, actor: string): Promise<void> {
+    const found = await this.findRow('customers', 'customer_id', customerId)
+    if (found) await this.blankRow('customers', found.rowNumber)
+    await this.appendAudit({
+      actor_email: actor,
+      action: 'delete',
+      object_type: 'customer',
+      object_id: customerId,
+      result: 'ok',
+    })
+  }
+
   // ---------- Pengguna ----------
 
   private toUser(row: Row): User {

@@ -1,19 +1,40 @@
+import { CarForm, CustomerForm } from '@/components/customer-forms'
+import { assignCar, removeCar, removeCustomer } from '@/lib/actions/customers'
 import { getRepo } from '@/lib/repo'
 import { requireUser } from '@/lib/session'
 
 export const metadata = { title: 'Pelanggan & CAR — netinv' }
 
-export default async function CustomersPage() {
+export default async function CustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ pesan?: string }>
+}) {
   await requireUser()
   const repo = getRepo()
-  const [cars, customers] = await Promise.all([repo.listCars(), repo.listCustomers()])
+  const params = await searchParams
+
+  const [cars, customers, devices] = await Promise.all([
+    repo.listCars(),
+    repo.listCustomers(),
+    repo.listDevices(),
+  ])
 
   const carById = new Map(cars.map((c) => [c.car_id, c]))
-  const devices = await repo.listDevices()
-  const countByCustomer = new Map<string, number>()
-  for (const d of devices) {
-    if (!d.customer_id) continue
-    countByCustomer.set(d.customer_id, (countByCustomer.get(d.customer_id) ?? 0) + 1)
+
+  const customersByCar = new Map<string, number>()
+  for (const customer of customers) {
+    if (!customer.car_id) continue
+    customersByCar.set(customer.car_id, (customersByCar.get(customer.car_id) ?? 0) + 1)
+  }
+
+  const devicesByCustomer = new Map<string, number>()
+  for (const device of devices) {
+    if (!device.customer_id) continue
+    devicesByCustomer.set(
+      device.customer_id,
+      (devicesByCustomer.get(device.customer_id) ?? 0) + 1,
+    )
   }
 
   return (
@@ -21,27 +42,36 @@ export default async function CustomersPage() {
       <div className="page-head">
         <div>
           <h1 className="page-title">Pelanggan &amp; CAR</h1>
-          <p className="page-sub">
-            CAR adalah nama orang yang dihubungi beserta nomor HP-nya
-          </p>
+          <p className="page-sub">CAR adalah nama orang yang dihubungi beserta nomor HP-nya</p>
         </div>
       </div>
+
+      {params.pesan ? (
+        <div className="notice notice-info">
+          <span aria-hidden="true">ℹ</span>
+          <div>{params.pesan}</div>
+        </div>
+      ) : null}
 
       <div className="notice notice-info">
         <span aria-hidden="true">ℹ</span>
         <div>
-          Satu CAR biasanya menangani <strong>beberapa pelanggan</strong>. Karena nomornya
-          disimpan pada orangnya — bukan diulang di setiap pelanggan — mengganti nomor HP cukup
-          mengubah <strong>satu</strong> baris, dan seluruh pelanggannya ikut terbarui.
+          Satu CAR biasanya menangani <strong>beberapa pelanggan</strong>. Karena nomornya disimpan
+          pada orangnya — bukan diulang di setiap pelanggan — mengganti nomor HP cukup mengubah{' '}
+          <strong>satu</strong> baris, dan seluruh pelanggannya ikut terbarui.
         </div>
       </div>
 
       <div className="card">
-        <h2 className="section-title">CAR</h2>
+        <h2 className="section-title">Tambah CAR</h2>
+        <CarForm />
+      </div>
+
+      <div className="card">
+        <h2 className="section-title">CAR terdaftar ({cars.length})</h2>
         {cars.length === 0 ? (
           <p className="dim" style={{ margin: 0, fontSize: 14 }}>
-            Belum ada CAR. Tambahkan orang yang biasa Anda hubungi untuk urusan perangkat
-            pelanggan.
+            Belum ada CAR. Tambahkan orang yang biasa Anda hubungi untuk urusan perangkat pelanggan.
           </p>
         ) : (
           <div className="table-wrap">
@@ -50,19 +80,28 @@ export default async function CustomersPage() {
                 <tr>
                   <th>Nama</th>
                   <th>Nomor HP</th>
-                  <th>Jumlah pelanggan</th>
+                  <th>Pelanggan ditangani</th>
                   <th>Catatan</th>
+                  <th className="right">Tindakan</th>
                 </tr>
               </thead>
               <tbody>
                 {cars.map((car) => {
-                  const handled = customers.filter((c) => c.car_id === car.car_id).length
+                  const handled = customersByCar.get(car.car_id) ?? 0
                   return (
                     <tr key={car.car_id}>
                       <td>{car.car_name}</td>
                       <td className="mono">{car.car_phone}</td>
                       <td className="dim">{handled}</td>
                       <td className="dim">{car.notes || '—'}</td>
+                      <td className="right">
+                        <form action={removeCar}>
+                          <input type="hidden" name="car_id" value={car.car_id} />
+                          <button className="btn btn-danger" type="submit">
+                            Hapus
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                   )
                 })}
@@ -73,11 +112,16 @@ export default async function CustomersPage() {
       </div>
 
       <div className="card">
-        <h2 className="section-title">Pelanggan</h2>
+        <h2 className="section-title">Tambah pelanggan</h2>
+        <CustomerForm cars={cars} />
+      </div>
+
+      <div className="card">
+        <h2 className="section-title">Pelanggan terdaftar ({customers.length})</h2>
         {customers.length === 0 ? (
           <p className="dim" style={{ margin: 0, fontSize: 14 }}>
-            Belum ada pelanggan. Pelanggan diperlakukan sebagai data tersendiri agar nama yang
-            salah ketik tidak membuat penyaringan data jadi kacau.
+            Belum ada pelanggan. Pelanggan diperlakukan sebagai data tersendiri agar nama yang salah
+            ketik tidak membuat penyaringan data jadi kacau.
           </p>
         ) : (
           <div className="table-wrap">
@@ -86,25 +130,47 @@ export default async function CustomersPage() {
                 <tr>
                   <th>Nama pelanggan</th>
                   <th>CAR</th>
-                  <th>Jumlah perangkat</th>
+                  <th>Perangkat</th>
+                  <th className="right">Tindakan</th>
                 </tr>
               </thead>
               <tbody>
-                {customers.map((c) => {
-                  const car = c.car_id ? carById.get(c.car_id) : undefined
+                {customers.map((customer) => {
+                  const car = customer.car_id ? carById.get(customer.car_id) : undefined
+                  const count = devicesByCustomer.get(customer.customer_id) ?? 0
                   return (
-                    <tr key={c.customer_id}>
-                      <td>{c.customer_name}</td>
+                    <tr key={customer.customer_id}>
+                      <td>{customer.customer_name}</td>
                       <td>
+                        <form action={assignCar} style={{ display: 'flex', gap: 8 }}>
+                          <input type="hidden" name="customer_id" value={customer.customer_id} />
+                          <select name="car_id" defaultValue={customer.car_id} aria-label="CAR">
+                            <option value="">— belum ditentukan —</option>
+                            {cars.map((option) => (
+                              <option key={option.car_id} value={option.car_id}>
+                                {option.car_name}
+                              </option>
+                            ))}
+                          </select>
+                          <button className="btn" type="submit">
+                            Simpan
+                          </button>
+                        </form>
                         {car ? (
-                          <>
-                            {car.car_name} <span className="faint mono">{car.car_phone}</span>
-                          </>
-                        ) : (
-                          <span className="faint">belum ada CAR</span>
-                        )}
+                          <div className="faint mono" style={{ marginTop: 4 }}>
+                            {car.car_phone}
+                          </div>
+                        ) : null}
                       </td>
-                      <td className="dim">{countByCustomer.get(c.customer_id) ?? 0}</td>
+                      <td className="dim">{count}</td>
+                      <td className="right">
+                        <form action={removeCustomer}>
+                          <input type="hidden" name="customer_id" value={customer.customer_id} />
+                          <button className="btn btn-danger" type="submit">
+                            Hapus
+                          </button>
+                        </form>
+                      </td>
                     </tr>
                   )
                 })}

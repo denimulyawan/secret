@@ -161,7 +161,20 @@ export default function AppShell({
           ))}
         </nav>
 
-        <div className="sidebar-foot">Masuk sebagai {ROLE_LABEL[role]}</div>
+        <div className="sidebar-foot">
+          <div>Masuk sebagai {ROLE_LABEL[role]}</div>
+          <a
+            href="/api/auth/logout"
+            style={{
+              display: 'inline-block',
+              marginTop: 6,
+              color: '#c8cdd4',
+              textDecoration: 'underline',
+            }}
+          >
+            Keluar
+          </a>
+        </div>
       </aside>
 
       <main className="main">{children}</main>

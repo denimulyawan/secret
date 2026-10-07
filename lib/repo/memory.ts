@@ -326,6 +326,28 @@ export class MemoryRepo implements Repo {
     return row
   }
 
+  async deleteCar(carId: string, actor: string): Promise<void> {
+    this.cars = this.cars.filter((c) => c.car_id !== carId)
+    await this.appendAudit({
+      actor_email: actor,
+      action: 'delete',
+      object_type: 'car',
+      object_id: carId,
+      result: 'ok',
+    })
+  }
+
+  async deleteCustomer(customerId: string, actor: string): Promise<void> {
+    this.customers = this.customers.filter((c) => c.customer_id !== customerId)
+    await this.appendAudit({
+      actor_email: actor,
+      action: 'delete',
+      object_type: 'customer',
+      object_id: customerId,
+      result: 'ok',
+    })
+  }
+
   // ---------- Pengguna ----------
 
   async listUsers(): Promise<User[]> {
