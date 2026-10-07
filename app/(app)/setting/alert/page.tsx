@@ -30,11 +30,10 @@ export default async function AlertPage() {
     )
   }
 
-  const [tokenSetting, chatId, days, time, mode, enabled, alertLog] = await Promise.all([
+  const [tokenSetting, chatId, days, mode, enabled, alertLog] = await Promise.all([
     repo.getSetting('telegram_bot_token'),
     repo.getSetting('telegram_chat_id'),
     repo.getSetting('alert_days_before'),
-    repo.getSetting('alert_time'),
     repo.getSetting('alert_mode'),
     repo.getSetting('alert_enabled'),
     repo.listAlertLog(50),
@@ -55,9 +54,16 @@ export default async function AlertPage() {
       <div className="notice notice-info">
         <span aria-hidden="true">ℹ</span>
         <div>
-          Hanya aset <strong>Customer</strong> yang dikirim ke Telegram. Aset Personal tetap
-          tercatat lengkap, tetapi tidak masuk notifikasi — sehingga nama dan alamat perangkat
-          pribadi tidak pernah muncul di percakapan Telegram.
+          <div>
+            Hanya aset <strong>Customer</strong> yang dikirim ke Telegram. Aset Personal tetap
+            tercatat lengkap, tetapi tidak masuk notifikasi — sehingga nama dan alamat perangkat
+            pribadi tidak pernah muncul di percakapan Telegram.
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <strong>Pemeriksaan berjalan sekali sehari, sekitar jam 08:00 WIB.</strong> Jam itu
+            mengikuti jadwal di berkas <code>vercel.json</code>, bukan diatur dari halaman ini —
+            paket Vercel Hobby hanya mengizinkan penjadwalan sekali sehari.
+          </div>
         </div>
       </div>
 
@@ -67,7 +73,6 @@ export default async function AlertPage() {
           values={{
             chatId: chatId?.value_enc ?? '',
             daysBefore: days?.value_enc || DEFAULT_DAYS,
-            time: time?.value_enc || '08:00',
             mode: mode?.value_enc || 'digest',
             enabled: (enabled?.value_enc ?? '').toUpperCase() === 'TRUE',
             hasToken,

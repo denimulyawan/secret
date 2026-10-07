@@ -306,20 +306,39 @@ Jendela login GitHub akan muncul sendiri. Anda yang menyetujui.
 
 ### Penjadwal alert
 
-Berkas `vercel.json` sudah mengatur pemeriksaan alert **setiap jam**, dan
-aplikasi hanya mengirim pada jam yang diatur di **Setting → Alert**.
+Berkas `vercel.json` sudah mengatur pemeriksaan alert **sekali sehari, jam 08:00
+WIB** (`0 1 * * *`, ditulis dalam UTC). Tidak ada yang perlu diubah.
 
-- Kalau paket Vercel Anda mengizinkan penjadwalan per jam, tidak ada yang perlu
-  diubah.
-- Kalau paket Anda hanya mengizinkan sekali sehari, ubah `schedule` di
-  `vercel.json` menjadi `0 1 * * *` (jam 08:00 WIB), lalu samakan jam di
-  **Setting → Alert** dengan jam itu.
+> **Kenapa sekali sehari, bukan per jam.** Paket Vercel **Hobby hanya mengizinkan
+> penjadwalan sekali sehari.** Kalau `vercel.json` memakai jadwal per jam pada
+> paket Hobby, penerapannya akan ditolak dengan pesan:
+> *"Hobby accounts are limited to daily cron jobs."*
+>
+> Karena itu **jam kirim tidak diatur dari dalam aplikasi** — jamnya mengikuti
+> jadwal di berkas itu. Yang bisa diatur dari aplikasi adalah **ambang hari**-nya —
+> misalnya 90, 60, 30, dan 7 hari sebelum lisensi habis. Ambang itulah yang
+> menentukan kapan Anda perlu bertindak, dan itu memang bagian yang paling penting.
+
+Kalau ingin jam kirim yang berbeda, ubah `schedule` di `vercel.json`. Rumusnya:
+**jam WIB dikurangi 7** menjadi jam UTC.
+
+| Jam kirim WIB | Jadwal di `vercel.json` |
+|---|---|
+| 06:00 | `0 23 * * *` |
+| 07:00 | `0 0 * * *` |
+| **08:00 (bawaan)** | **`0 1 * * *`** |
+| 09:00 | `0 2 * * *` |
+| 12:00 | `0 5 * * *` |
 
 **Menguji alert tanpa menunggu jadwal:** buka
 
 ```
-https://<domain-anda>/api/cron/alert?force=1&secret=<CRON_SECRET>
+https://<domain-anda>/api/cron/alert?secret=<CRON_SECRET>
 ```
+
+Aman dipanggil berkali-kali. Catatan `alert_log` mencegah pesan yang sama
+terkirim dua kali untuk lisensi yang sama — jadi memanggilnya berulang tidak akan
+membanjiri Telegram Anda.
 
 ---
 

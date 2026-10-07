@@ -117,7 +117,6 @@ export async function saveAlertSettings(
   const token = text(formData, 'telegram_bot_token')
   const chatId = text(formData, 'telegram_chat_id')
   const days = text(formData, 'alert_days_before')
-  const time = text(formData, 'alert_time') || '08:00'
   const mode = text(formData, 'alert_mode') || 'digest'
   const enabled = text(formData, 'alert_enabled') === 'on'
 
@@ -129,9 +128,6 @@ export async function saveAlertSettings(
       errors.alert_days_before = 'Isi angka hari yang dipisahkan koma, misalnya: 90,60,30,7'
     }
   }
-  if (time && !/^\d{2}:\d{2}$/.test(time)) {
-    errors.alert_time = 'Format jam harus HH:MM, misalnya 08:00'
-  }
   if (Object.keys(errors).length > 0) return failed(errors)
 
   // Token hanya ditulis kalau benar-benar diisi, supaya membuka halaman ini
@@ -139,7 +135,6 @@ export async function saveAlertSettings(
   if (token) await repo.putSetting('telegram_bot_token', token, true, user.email)
   await repo.putSetting('telegram_chat_id', chatId, false, user.email)
   await repo.putSetting('alert_days_before', days, false, user.email)
-  await repo.putSetting('alert_time', time, false, user.email)
   await repo.putSetting('alert_mode', mode, false, user.email)
   await repo.putSetting('alert_enabled', enabled ? 'TRUE' : 'FALSE', false, user.email)
 

@@ -27,10 +27,8 @@ import {
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
-function wibHour(): number {
-  return (new Date().getUTCHours() + 7) % 24
-}
+// Batas waktu fungsi. Pemeriksaan ini membaca beberapa tab lalu mengirim pesan.
+export const maxDuration = 60
 
 export async function GET(request: Request) {
   const url = new URL(request.url)
@@ -44,17 +42,15 @@ export async function GET(request: Request) {
     return Response.json({ ok: false, error: 'Tidak diizinkan.' }, { status: 401 })
   }
 
-  const force = url.searchParams.get('force') === '1'
   const repo = getRepo()
 
   try {
-    const [enabledSetting, tokenSetting, chatIdSetting, daysSetting, timeSetting, modeSetting] =
+    const [enabledSetting, tokenSetting, chatIdSetting, daysSetting, modeSetting] =
       await Promise.all([
         repo.getSetting('alert_enabled'),
         repo.getSetting('telegram_bot_token'),
         repo.getSetting('telegram_chat_id'),
         repo.getSetting('alert_days_before'),
-        repo.getSetting('alert_time'),
         repo.getSetting('alert_mode'),
       ])
 
@@ -62,14 +58,10 @@ export async function GET(request: Request) {
       return Response.json({ ok: true, skipped: 'Saklar alert sedang dimatikan.' })
     }
 
-    // Hanya jalan pada jam yang diminta, kecuali dipaksa.
-    const targetHour = Number((timeSetting?.value_enc ?? '08:00').split(':')[0])
-    if (!force && Number.isFinite(targetHour) && wibHour() !== targetHour) {
-      return Response.json({
-        ok: true,
-        skipped: `Bukan jam pengiriman. Sekarang ${wibHour()}:00 WIB, diatur ${targetHour}:00 WIB.`,
-      })
-    }
+    // Jam pengiriman ditentukan oleh jadwal di vercel.json, bukan dari dalam
+    // aplikasi. Alasannya: paket Vercel Hobby hanya mengizinkan penjadwalan
+    // sekali sehari, sehingga jam kirim tidak bisa diatur bebas dari sini.
+    // Pengaman terhadap pengiriman dobel tetap dijaga oleh alert_log.
 
     if (!tokenSetting?.value_enc) {
       return Response.json({ ok: false, error: 'Token bot Telegram belum diisi.' }, { status: 400 })

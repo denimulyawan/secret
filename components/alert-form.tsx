@@ -8,7 +8,6 @@ import FormField from './form-field'
 export interface AlertValues {
   chatId: string
   daysBefore: string
-  time: string
   mode: string
   enabled: boolean
   hasToken: boolean
@@ -74,20 +73,6 @@ export default function AlertForm({ values }: { values: AlertValues }) {
             type="text"
             defaultValue={values.daysBefore}
             autoComplete="off"
-          />
-        </FormField>
-
-        <FormField
-          label="Jam kirim"
-          name="alert_time"
-          error={state.errors?.alert_time}
-          hint="Satu kali sehari, format HH:MM dalam zona waktu WIB"
-        >
-          <input
-            id="alert_time"
-            name="alert_time"
-            type="time"
-            defaultValue={values.time}
           />
         </FormField>
 
