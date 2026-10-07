@@ -1,0 +1,61 @@
+﻿# ============================================================================
+# Repo ini HANYA berisi kode aplikasi. TIDAK ADA DATA di dalamnya.
+# ============================================================================
+# Aturan yang dipegang:
+#   1. Data aset (perangkat, pelanggan, CAR, kredensial) TIDAK PERNAH masuk repo.
+#      Data diisi oleh pemilik lewat aplikasi, tersimpan di luar repo.
+#   2. Aplikasi dimulai dengan data KOSONG. Tidak ada data contoh sekalipun.
+#   3. Dokumen kerja internal (rancangan, catatan) tidak ikut — itu bukan
+#      bagian dari aplikasi.
+#   4. Rahasia (.env, kunci, token, service account) tidak pernah masuk.
+# ============================================================================
+
+# --- Dokumen kerja internal & catatan (bukan bagian aplikasi) ---
+*.md
+!README.md
+docs-internal/
+
+# --- Data aset: apa pun bentuknya ---
+data/
+*.csv
+*.xlsx
+*.xls
+all_*_administrators.csv
+
+# --- Rahasia ---
+.env
+.env.*
+!.env.example
+*-real.txt
+*.pem
+*.key
+*.p12
+*.pfx
+service-account*.json
+*service_account*.json
+*serviceaccount*.json
+client_secret*.json
+credentials*.json
+
+# --- Build & cache ---
+node_modules/
+.next/
+.vercel
+.turbo
+dist/
+build/
+out/
+__pycache__/
+*.pyc
+.venv/
+venv/
+coverage/
+*.tsbuildinfo
+
+# --- Editor & sistem ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
