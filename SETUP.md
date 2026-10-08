@@ -27,10 +27,34 @@ Anda sendiri. Jangan pernah menyalin nilai asli ke dalam berkas yang masuk repo.
 
 ## 1. Buat spreadsheet dan 12 tab
 
+### Cara cepat — pakai skrip (disarankan, ± 2 menit)
+
+Skrip ini membuat seluruh 12 tab beserta judul kolomnya sekaligus, plus dropdown
+dan pelindung baris judul. Jauh lebih cepat dan tidak rawan salah ketik.
+
 1. Buka [sheets.new](https://sheets.new) — spreadsheet baru akan terbuka.
 2. Beri nama, misalnya `Inventory Device`.
-3. Buat 12 tab dengan nama **persis** seperti di bawah. Nama tab harus sama
-   huruf besar-kecilnya.
+3. Menu **Extensions → Apps Script**.
+4. Hapus isi berkas yang muncul, lalu tempel **seluruh isi** berkas
+   **[SETUP-SHEET.gs](SETUP-SHEET.gs)**.
+5. Klik **Save** (ikon disket) → pilih fungsi **SIAPKAN** → klik **Run**.
+6. Setujui permintaan izin. Muncul peringatan "Google hasn't verified this app"
+   — itu wajar, karena skripnya milik Anda sendiri. Klik **Advanced** →
+   **Go to (nama project) → Allow**.
+7. Lihat hasilnya di **Execution log**. Semua kolom akan dilaporkan lengkap.
+8. **Hapus project Apps Script itu** setelah selesai, supaya tidak tertinggal.
+
+Skripnya **aman dijalankan berkali-kali**: tab yang sudah berisi data tidak akan
+ditimpa. Ada juga fungsi **PERIKSA** yang hanya memeriksa tanpa mengubah apa pun.
+
+### Cara manual — kalau lebih suka membuat sendiri
+
+Kalau Anda memilih cara ini, kerjakan dengan teliti: nama tab harus sama persis
+huruf besar-kecilnya.
+
+1. Buka [sheets.new](https://sheets.new) — spreadsheet baru akan terbuka.
+2. Beri nama, misalnya `Inventory Device`.
+3. Buat 12 tab dengan nama **persis** seperti di bawah.
 4. Di **baris pertama setiap tab**, tempel baris judul di bawah. Cara paling
    mudah: salin satu baris, klik sel `A1` di tab itu, lalu tempel.
 
